@@ -88,12 +88,9 @@ void loop() {
     Serial.println(" Amps RMS");
     #endif
   
-    double difference = Arms - LastArms;
-    if(abs(difference) > 0.1)
-    {
-      send(msg.set(Arms,1));
-      LastArms = Arms;
-    }
+    send(msg.set(Arms,1));
+    LastArms = Arms;
+    
     lastTransmitTime = millis();
   }
 }
