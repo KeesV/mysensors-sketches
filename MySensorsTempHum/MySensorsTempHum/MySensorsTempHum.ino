@@ -25,7 +25,7 @@
  */
 
 // Enable debug prints to serial monitor
-#define MY_DEBUG 
+//#define MY_DEBUG 
 
 // Enable and select radio type attached
 #define MY_RADIO_NRF24
@@ -46,7 +46,7 @@ uint8_t lastHeartbeatTime = 0;
 
 // DHT22 temperature & humidity sensor stuff
 #define DHT_DATA_PIN 4
-#define SENSOR_TEMP_OFFSET 0
+#define SENSOR_TEMP_OFFSET -1
 
 #define CHILD_ID_HUM 0
 #define CHILD_ID_TEMP 1
@@ -127,6 +127,7 @@ void loop()
      oldBatteryPcnt = batteryPcnt;
    }
 
+    sleep(dht.getMinimumSamplingPeriod());
     dht.readSensor(true);
     // Fetch temperature from DHT sensor
     float temperature = dht.getTemperature();
