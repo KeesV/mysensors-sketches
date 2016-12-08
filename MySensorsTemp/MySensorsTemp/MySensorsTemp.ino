@@ -26,7 +26,7 @@
 
 
 // Enable debug prints to serial monitor
-//#define MY_DEBUG 
+#define MY_DEBUG 
 
 // Enable and select radio type attached
 #define MY_RADIO_NRF24
@@ -40,17 +40,21 @@
 int BATTERY_SENSE_PIN = A0;  // select the input pin for the battery sense point
 int oldBatteryPcnt = 0;
 
-#define COMPARE_TEMP 1 // Send temperature only if changed? 1 = Yes 0 = No
-
-#define ONE_WIRE_BUS 3 // Pin where dallase sensor is connected 
+#define ONE_WIRE_BUS 3 // Pin where dallas sensor is connected 
 #define MAX_ATTACHED_DS18B20 16
-unsigned long SLEEP_TIME = 30000; // Sleep time between reads (in milliseconds)
+
+unsigned long MIN_SLEEP_TIME = 30000; // Sleep time between reads (in milliseconds)
+unsigned long MAX_SLEEP_TIME = 3600000; //Maximum sleep time, after this it will send a keepAlive message
+
 OneWire oneWire(ONE_WIRE_BUS); // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 DallasTemperature sensors(&oneWire); // Pass the oneWire reference to Dallas Temperature. 
+
 float lastTemperature[MAX_ATTACHED_DS18B20];
 int numSensors=0;
 bool receivedConfig = false;
 bool metric = true;
+
+uint8_t lastHeartbeatTime = 0;
 
 // Initialize temperature message
 MyMessage msg(0,V_TEMP);
@@ -76,7 +80,7 @@ void setup()
 
 void presentation() {
   // Send the sketch version information to the gateway and Controller
-  sendSketchInfo("Temperature Sensor, Battery Powered", "1.1");
+  sendSketchInfo("Temp Sensor, Batt Pwr", "1.2");
 
   // Fetch the number of attached temperature sensors  
   numSensors = sensors.getDeviceCount();
@@ -139,20 +143,20 @@ void loop()
       float temperature = static_cast<float>(static_cast<int>((getConfig().isMetric?sensors.getTempCByIndex(i):sensors.getTempFByIndex(i)) * 10.)) / 10.;
    
       // Only send data if temperature has changed and no error
-      #if COMPARE_TEMP == 1
-      if (lastTemperature[i] != temperature && temperature != -127.00 && temperature != 85.00) {
-      #else
-      if (temperature != -127.00 && temperature != 85.00) {
-      #endif
-   
+      if (lastTemperature[i] != temperature && temperature != -127.00 && temperature != 85.00) { 
         // Send in the new temperature
         send(msg.setSensor(i).set(temperature,1));
+        sendHeartbeat();
         // Save new temperatures for next compare
         lastTemperature[i]=temperature;
       }
     }
 
-   
+    if(millis() - lastHeartbeatTime > MAX_SLEEP_TIME)
+    {
+      sendHeartbeat();
+      lastHeartbeatTime = millis();
+    }
   
-  sleep(SLEEP_TIME);
+    sleep(MIN_SLEEP_TIME);
 }
