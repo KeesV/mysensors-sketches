@@ -96,7 +96,7 @@
 #define MY_DEFAULT_LED_BLINK_PERIOD 300
 
 // Enable inclusion mode
-#define MY_INCLUSION_MODE_FEATURE
+//#define MY_INCLUSION_MODE_FEATURE
 // Enable Inclusion mode button on gateway
 #define MY_INCLUSION_BUTTON_FEATURE
 // Set inclusion mode duration (in seconds)
@@ -105,9 +105,9 @@
 #define MY_INCLUSION_MODE_BUTTON_PIN  3 
 
 // Uncomment to override default HW configurations
-//#define MY_DEFAULT_ERR_LED_PIN 7  // Error led pin
-//#define MY_DEFAULT_RX_LED_PIN  8  // Receive led pin
-//#define MY_DEFAULT_TX_LED_PIN  9  // the PCB, on board LED
+#define MY_DEFAULT_ERR_LED_PIN 7
+#define MY_DEFAULT_TX_LED_PIN 8
+#define MY_DEFAULT_RX_LED_PIN 9
 
 #include <SPI.h>
 
