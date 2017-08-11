@@ -105,7 +105,7 @@ void setup() {
 }
 
 void presentation() {
-  sendSketchInfo("Current Sensor", "1.0");
+  sendSketchInfo("Current Sensor", "1.1");
   present(CHILD_ID_CURRENT, S_MULTIMETER);
   present(CHILD_ID_ONOFF, S_BINARY);
   present(CHILD_ID_TEMP, S_TEMP);

@@ -3,7 +3,7 @@
 
 // Enable and select radio type attached
 #define MY_RADIO_NRF24
-#define MY_RF24_PA_LEVEL RF24_PA_MIN
+#define MY_RF24_PA_LEVEL RF24_PA_LOW
 //#define MY_RADIO_RFM69
 
 #define LED_PIN 6
@@ -27,7 +27,7 @@
 #define LIGHT_ON 1
 
 #define SN "Motion trgr dimlight"
-#define SV "1.0"
+#define SV "1.1"
 
 //States for the state machine
 #define STATE_IDLE 0
@@ -46,8 +46,7 @@ int MaxDimValue = 255; //The maximum value to fade the light to. Between 0..255
 int CurrentDimValue = 0;
 int DesiredDimValue = 0;
 
-MyMessage lightMsg(CHILD_ID_LIGHT, V_LIGHT);
-MyMessage dimmerMsg(CHILD_ID_LIGHT, V_DIMMER);
+MyMessage dimmerMsg(CHILD_ID_LIGHT, V_PERCENTAGE);
 MyMessage motionMsg(CHILD_ID_MOTION, V_TRIPPED);
 
 void setup()  
@@ -200,8 +199,8 @@ void loop()
 
 void receive(const MyMessage &message)
 {
-  if (message.type == V_LIGHT) {
-    Serial.println( "V_LIGHT command received..." );
+  if (message.type == V_STATUS) {
+    Serial.println( "V_STATUS command received..." );
     int lstate= atoi( message.data );
     Serial.print("light command: ");
     Serial.println(lstate);
@@ -213,7 +212,7 @@ void receive(const MyMessage &message)
       Serial.println("LIGHT_ON received. Ignored!");
     }
   }
-  else if (message.type == V_DIMMER) {
+  else if (message.type == V_PERCENTAGE) {
     Serial.println( "V_DIMMER command received..." );  
     int dimvalue= atoi( message.data );
     if ((dimvalue<0)||(dimvalue>100)) {
